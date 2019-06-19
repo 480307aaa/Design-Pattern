@@ -1,0 +1,165 @@
+import java.util.ArrayList;
+
+/**
+ * @author yaoshw
+ */
+public class TestMyIdea {
+    public static void main(String[] args) {
+
+        WeatherData weatherData = new WeatherData();
+        //建立第一个告示牌
+        CurrentConditionDispaly currentConditionDispaly = new CurrentConditionDispaly(weatherData);
+        weatherData.setMeasurements(80, 65, 30.4f);
+        weatherData.setMeasurements(82, 70, 29.2f);
+        weatherData.setMeasurements(78, 90, 29.2f);
+    }
+}
+
+/**
+ * 主题接口
+ */
+interface Subject {
+
+    public void registerObserver(Observer o);
+
+    public void removeObserver(Observer o);
+
+    public void notifyObservers();
+}
+
+/**
+ * 观察者接口
+ */
+interface Observer {
+    public void update(double temp, double humidity, double pressure);
+}
+
+/**
+ * 当主题状态改变时，这个方法会被
+ * 调用，以通知所有的观察者。
+ */
+interface DisplyElement {
+    public void display();
+}
+
+/**
+ * weathData对象:封装需要监控的变化
+ */
+class WeatherData implements Subject {
+
+    private double temp;
+    private double humidity;
+    private double pressure;
+    ArrayList observerList;
+
+    public double getTemp() {
+        return temp;
+    }
+
+    public void setTemp(double temp) {
+        this.temp = temp;
+    }
+
+    public double getHumidity() {
+        return humidity;
+    }
+
+    public void setHumidity(double humidity) {
+        this.humidity = humidity;
+    }
+
+    public double getPressure() {
+        return pressure;
+    }
+
+    public void setPressure(double pressure) {
+        this.pressure = pressure;
+    }
+
+    public ArrayList getObserverList() {
+        return observerList;
+    }
+
+    public void setObserverList(ArrayList observerList) {
+        this.observerList = observerList;
+    }
+
+    public WeatherData() {
+        observerList = new ArrayList();
+    }
+
+    @Override
+    public void registerObserver(Observer o) {
+        observerList.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        if (observerList.indexOf(o) > 0) {
+            observerList.remove(o);
+        }
+    }
+
+    /**
+     * 通知观察者数据有改变
+     */
+    @Override
+    public void notifyObservers() {
+        for (int i = 0; i < observerList.size(); i++) {
+            Observer o = (Observer) observerList.get(i);
+            o.update(temp, humidity, pressure);
+        }
+    }
+
+    /**
+     * 数据发生改变，通知观察者
+     */
+    public void measureChange() {
+        notifyObservers();
+    }
+
+    //
+    public void setMeasurements(float temp, float humidity, float pressure) {
+        this.temp = temp;
+        this.humidity = humidity;
+        this.pressure = pressure;
+        measureChange();
+    }
+}
+
+class CurrentConditionDispaly implements Observer, DisplyElement {
+
+    private double temp;
+    private double humidity;
+    /**
+     * 该对象用于将观察者注册到主题上使用
+     */
+    Subject weatherData;
+
+    public CurrentConditionDispaly(Subject weatherData) {
+        this.weatherData = weatherData;
+        //将观察者注册到主题
+        weatherData.registerObserver(this);
+    }
+
+
+    /**
+     * update方法被调用时，会调用display方法进行数据的展示
+     *
+     * @param temp
+     * @param humidity
+     * @param pressure
+     */
+    @Override
+    public void update(double temp, double humidity, double pressure) {
+        this.temp = temp;
+        this.humidity = humidity;
+        display();
+    }
+
+    @Override
+    public void display() {
+        System.out.println("温度为" + temp + "度，" + "湿度为" + humidity);
+    }
+}
+

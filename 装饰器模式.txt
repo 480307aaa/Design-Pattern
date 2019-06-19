@@ -1,0 +1,154 @@
+/**
+ * @author yaoshw
+ */
+public class TestMyIdea {
+    public static void main(String[] args) {
+
+        //不添加任何调料的饮料A
+        Beverage beverage = new APart();
+        System.out.println("Apart:" + beverage.getDescription() + "," + beverage.cost());
+
+        //添加摩卡调料的饮料B
+        Beverage beverage1 = new Mocha(new BPart());
+        System.out.println("Bpart:" + beverage1.getDescription() + "," + beverage1.cost());
+
+        //添加双份摩卡的饮料C
+
+        Beverage beverage2 = new Mocha(new Mocha(new CPart()));
+        System.out.println("Cpart:" + beverage2.getDescription() + "," + beverage2.cost());
+
+        //添加一份摩卡、一份豆浆的饮料D
+
+        Beverage beverage3 = new Soy(new Mocha(new DPart()));
+        System.out.println("Dpart:" + beverage3.getDescription() + "," + beverage3.cost());
+
+
+    }
+}
+
+/**
+ * 抽象类，相当于Component:cost方法和getDescription方法
+ */
+abstract class Beverage {
+
+    String description = "UnKnownBeverage";
+
+    public String getDescription() {
+        return description;
+    }
+
+    public abstract double cost();
+}
+
+abstract class CondimentDerector extends Beverage {
+    @Override
+    public abstract String getDescription();
+}
+
+/**
+ * 具体装饰者：摩卡
+ */
+class Mocha extends CondimentDerector {
+
+    /**
+     * 保留基类的引用，以便于组合装饰者行为
+     */
+    Beverage beverage;
+
+    public Mocha(Beverage beverage) {
+        this.beverage = beverage;
+    }
+
+    @Override
+    public double cost() {
+        return beverage.cost() + 2;
+    }
+
+    @Override
+    public String getDescription() {
+        return beverage.getDescription() + ",monka";
+    }
+}
+
+/**
+ * 具体装饰者：豆浆
+ */
+class Soy extends CondimentDerector {
+
+    Beverage beverage;
+
+    public Soy(Beverage beverage) {
+        this.beverage = beverage;
+    }
+
+    @Override
+    public double cost() {
+        return beverage.cost() + 3;
+    }
+
+    @Override
+    public String getDescription() {
+        return beverage.getDescription() + "soy";
+    }
+}
+
+/**
+ * 调料A
+ */
+class APart extends Beverage {
+
+    public APart() {
+        description = "Apart";
+    }
+
+    @Override
+    public double cost() {
+        return 19.5;
+    }
+}
+
+/**
+ * 调料B
+ */
+class BPart extends Beverage {
+
+    public BPart() {
+        description = "Bpart";
+    }
+
+    @Override
+    public double cost() {
+        return 20.5;
+    }
+}
+
+/**
+ * 调料C
+ */
+class CPart extends Beverage {
+
+    public CPart() {
+        description = "Cpart";
+    }
+
+    @Override
+    public double cost() {
+        return 21.5;
+    }
+}
+
+/**
+ * 调料D
+ */
+class DPart extends Beverage {
+
+    public DPart() {
+        description = "Dpart";
+    }
+
+    @Override
+    public double cost() {
+        return 22.5;
+    }
+}
+

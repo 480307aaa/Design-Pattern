@@ -1,0 +1,116 @@
+工厂方法（Factory Method）的定义：
+
+工厂方法模式是简单工厂模式的进一步抽象化和推广，工厂方法模式里不再只由一个工厂类决定那一个产品类应当被实例化,这个决定被交给抽象工厂的子类去做。
+
+工厂方法（Factory Method）的组成：
+
+1)抽象工厂角色（AbstractFactory）：这是工厂方法模式的核心，它与应用程序无关。是具体工厂角色必须实现的接口或者必须继承的父类。在java中它由抽象类或者接口来实现。
+2)具体工厂角色(ConcreteFactory)：它含有和具体业务逻辑有关的代码。由应用程序调用以创建对应的具体产品的对象。
+3)抽象产品角色(AbstractProduct)：它是具体产品继承的父类或者是实现的接口。在java中一般有抽象类或者接口来实现。
+4)具体产品角色(ConcreteProduct)：具体工厂角色所创建的对象就是此角色的实例。在java中由具体的类来实现。
+
+
+我们首先定义抽象工厂角色，这里我们用一个抽象类来实现这个角色
+
+1 abstract class Factory {
+2     public abstract Moveable createProduct();
+3 }
+定义产生产品的具体工厂角色，去继承抽象工厂角色，也就是继承Factory类(如果不明白为啥这里用抽象类而不用接口，可以自行百度两者的区别)
+
+
+ 1 class CarFactory extends Factory{
+ 2 
+ 3     @Override
+ 4     public Moveable createProduct() {
+ 5         
+ 6         return new Car();
+ 7     }
+ 8     
+ 9 }
+10 class PlaneFactory extends Factory{
+11 
+12     @Override
+13     public Moveable createProduct() {
+14         
+15         return new Plane();
+16     }
+17     
+18 }
+19 class BroomFactory extends Factory{
+20 
+21     @Override
+22     public Moveable createProduct() {
+23         
+24         return new Broom();
+25     }
+26     
+27 }
+
+接下来就是我们的抽象产品角色，就是前面那个Moveable接口，代码也粘过来把，看的流畅一些
+
+1 public interface Moveable {
+2     public abstract void run();
+3 }
+最后我们来定义具体产品角色，需要实现抽象产品角色，就是前面的具体类Car、Plane、Broom嘛，我们也粘过来
+
+
+ 1 class Car implements Moveable {
+ 2 
+ 3     @Override
+ 4     public void run() {
+ 5         System.out.println("Car冒着烟开来了....");
+ 6     }
+ 7 
+ 8 }
+ 9 
+10 class Plane implements Moveable {
+11 
+12     @Override
+13     public void run() {
+14         System.out.println("扇着翅膀飞走了....");
+15     }
+16 
+17 }
+18 
+19 class Broom implements Moveable {
+20 
+21     @Override
+22     public void run() {
+23         System.out.println("骑着扫把而来....");
+24     }
+25 
+26 }
+
+接下来我们写个测试类测试一下我们的成果：
+
+ 1 public class SimpleFactoryTest {
+ 2 
+ 3     public static void main(String args[]) {
+ 4         // 这里用到了多态，相信大家可以看明白
+ 5         // 生产Car
+ 6         Factory factory = new CarFactory();
+ 7         Moveable m1 = factory.createProduct();
+ 8         // 生产Plane
+ 9         Factory factory2 = new PlaneFactory();
+10         Moveable m2 = factory2.createProduct();
+11         // 生产Broom
+12         Factory factory3 = new BroomFactory();
+13         Moveable m3 = factory3.createProduct();
+14         // 调用具体对象的方法
+15         m1.run();
+16         m2.run();
+17         m3.run();
+18     }
+19 }
+
+运行结果：
+
+Car冒着烟开来了....
+扇着翅膀飞走了....
+骑着扫把而来....
+从上面创建产品对象的代码可以看出，工厂方法和简单工厂的主要区别是，简单工厂是把创建产品的职能都放在一个类里面，而工厂方法则把不同的产品放在实现了工厂
+接口的不同工厂类里面，这样就算其中一个工厂类出了问题，其他工厂类也能正常工作，互相不受影响，以后增加新产品，也只需要新增一个实现工厂接口工厂类，
+就能达到，不用修改已有的代码。但工厂方法也有它局限的地方，那就是当面对的产品有复杂的等级结构的时候，例如，工厂除了生产交通工具外，还生产家电，
+这样一来家电、交通工具就是两大产品家族了，这两大家族下面包含了数量众多的产品，每个产品又有多个型号，这样就形成了一个复杂的产品树了。如果用工厂方法来
+设计这个产品家族系统，就必须为每个型号的产品创建一个对应的工厂类，当有数百种甚至上千种产品的时候，也必须要有对应的上百成千个工厂类，你没感觉工厂类有
+\点多吗？这就出现了传说的类爆炸，工厂类泛滥了.虽然他很好的符合了“开闭原则”，但是由于每新增一个新产品时就需要增加两个类，这样势必会导致系统的复杂度增加.

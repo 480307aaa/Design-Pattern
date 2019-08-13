@@ -1,0 +1,232 @@
+    所谓抽象工厂模式就是提供一个接口，用于创建相关或者依赖对象的家族，而不需要明确指定具体类。他允许客户端使用抽象的接口来创建一组相关的产品，而不需要关系实
+际产出的具体产品是什么。这样一来，客户就可以从具体的产品中被解耦。它的优点是隔离了具体类的生成，使得客户端不需要知道什么被创建了，而缺点就在于新增新的行
+为会比较麻烦，因为当添加一个新的产品对象时，需要更加需要更改接口及其下所有子类。
+抽象工厂（Factory Method）
+
+    抽象工厂：意图在于创建一系列互相关联或互相依赖的对象。我自己觉得抽象工厂是在工厂方法的基础上引进了分类管理的概念....，工厂方法用来创建一个产品，它
+没有分类的概念，而抽象工厂则用于创建一系列产品，所以产品分类成了抽象工厂的重点
+
+抽象工厂的组成
+
+ 1.AbstractFactory   
+
+　 声明一个创建抽象产品对象的操作接口。
+
+ 2.ConcreteFactory
+
+　 创建具体产品对象的操作。
+
+ 3.AbstractProduct
+
+   为一类产品对象声明一个接口。
+
+ 4.ConcreteProduct
+
+   定义一个将被相应的具体工厂创建的产品对象。
+
+   实现abstractProduct接口。
+
+ 5.Client
+
+   仅使用由AbstractFactory和AbstractProduct类声明的接口
+
+
+第一步：创建AbstractFactory，里面有三个抽象函数，代表可以生产的三种抽象产品的类型  
+
+
+1 public abstract class abstractFactory {
+2 
+3     //生产抽象交通工具的操作接口
+4     public abstract vehicle createVehicle();
+5     //生产抽象食品的的操作接口
+6     public abstract Food createFood();
+7     //生产抽象武器的操作接口
+8     public abstract Weapon createWeapon();
+9 }
+
+第二步：创建ConcreteFactory，具体工厂类，去继承abstractFactory,使得具体工厂可以生产抽象工厂定义的产品系列
+
+默认工厂：
+
+复制代码
+ 1 //默认工厂生产的产品
+ 2 public class DefaultFactory extends abstractFactory {
+ 3 
+ 4     @Override
+ 5     public vehicle createVehicle() {
+ 6         //在我这个工厂生产的是汽车这种交通工具
+ 7         return new Car();
+ 8     }
+ 9 
+10     @Override
+11     public Food createFood() {
+12         //吃的是苹果
+13         return new apple();
+14     }
+15 
+16     @Override
+17     public Weapon createWeapon() {
+18         //我用的是CF中的大狙，百步穿杨
+19         return new Barrete();
+20     }
+21 
+22 }
+
+魔法工厂：
+
+复制代码
+ 1 //魔法工厂生产的产品系列
+ 2 public class MagicFactory  extends abstractFactory{
+ 3 
+ 4     @Override
+ 5     public vehicle createVehicle() {
+ 6         //我要生产飞机啦
+ 7         return new Plane();
+ 8     }
+ 9 
+10     @Override
+11     public Food createFood() {
+12         //我的食物：蘑菇
+13         return new MushRoom();
+14     }
+15 
+16     @Override
+17     public Weapon createWeapon() {
+18         //我的武器：魔法棒
+19         return new magicStick();
+20     }
+21 
+22 }
+
+第三步：创建抽象产品AbstractProduct，就是我们前面提到的Vehicle、Food、Weapon三个抽象产品类，附上代码
+
+
+ 1 public abstract class Weapon {
+ 2 
+ 3     public abstract void shoot();
+ 4 }
+ 5 public abstract class vehicle {
+ 6 
+ 7     public abstract void run();
+ 8 }
+ 9 public abstract class Food {
+10 
+11     public abstract void printName();
+12 }
+
+第四步：创建ConcreteProduct，就是我们的具体产品，默认工厂生产的产品系列：Car、Apple、Barrett
+
+ 1 public class Car extends vehicle {
+ 2 
+ 3     @Override
+ 4     public void run() {
+ 5         System.out.println("Car...");
+ 6     }
+ 7 
+ 8 }
+ 9 public class apple extends Food {
+10 
+11     @Override
+12     public void printName() {
+13         System.out.println("apple....");
+14     }
+15 
+16 }
+17 public class Barrete extends Weapon {
+18 
+19     @Override
+20     public void shoot() {
+21         System.out.println("巴雷特狙击枪");
+22     }
+23 
+24 }
+
+
+魔法工厂生产的产品系列：Plane、MushRoom、magicStick
+
+
+ 1 class Plane extends vehicle {
+ 2 
+ 3     @Override
+ 4     public void run() {
+ 5         System.out.println("Plane...");
+ 6     }
+ 7 
+ 8 }
+ 9 class MushRoom extends Food {
+10 
+11     @Override
+12     public void printName() {
+13         System.out.println("MushRoom");
+14     }
+15 
+16 }
+17 class magicStick extends Weapon {
+18 
+19     @Override
+20     public void shoot() {
+21         System.out.println("魔法棒");
+22     }
+23 
+24 }
+
+第五步：创建Client，就是我们的测试类Test，来测试一下我们的工厂
+
+我们使用默认工厂生产产品系列
+
+复制代码
+ 1 public class ClientTest {
+ 2 
+ 3     /**
+ 4      * @param args
+ 5      */
+ 6     public static void main(String[] args) {
+ 7 
+ 8         abstractFactory factory =new DefaultFactory();
+ 9         Vehicle vehicle=factory.createVehicle();
+10         vehicle.run();
+11         Food food=factory.createFood();
+12         food.printName();
+13         Weapon weapon=factory.createWeapon();
+14         weapon.shoot();
+15         System.out.println("--------分割线---------");
+16     }
+17 
+18 }
+
+运行结果：
+
+Car...
+apple....
+巴雷特狙击枪
+--------分割线---------
+当我们想使用魔法工厂生产另一个产品系列时只需要更改很少的代码
+
+
+ 1 public class ClientTest {
+ 2 
+ 3     /**
+ 4      * @param args
+ 5      */
+ 6     public static void main(String[] args) {
+ 7 
+ 8         //注意就改了这一个位置，把defaultFactory换成MagicFactory即可
+ 9         abstractFactory factory =new MagicFactory();
+10         Vehicle vehicle=factory.createVehicle();
+11         vehicle.run();
+12         Food food=factory.createFood();
+13         food.printName();
+14         Weapon weapon=factory.createWeapon();
+15         weapon.shoot();
+16         System.out.println("--------分割线---------");
+17     }
+18 
+19 }
+运行结果：
+
+Plane...
+MushRoom
+魔法棒
+--------分割线---------
+在抽象工厂模式中，抽象产品 (AbstractProduct) 可能是一个或多个，从而构成一个或多个产品族(Product Family)。 在只有一个产品族的情况下，抽象工厂模式
+实际上退化到工厂方法模式。

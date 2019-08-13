@@ -1,0 +1,270 @@
+桥接模式(Bridge)的定义
+
+在软件系统中，某些类型由于自身的逻辑，它具有两个或多个维度的变化，那么如何应对这种“多维度的变化”？这就要使用桥接模式
+
+将抽象部分与它的实现部分分离，使它们都可以独立地变化。
+
+桥接模式(Bridge)的动机
+
+当一种抽象类型可能有多种实现方式时，一般情况我们可以考虑使用继承来解决抽象类型的多种实现，在抽象类型中定义接口，而子类负责接口的具体实现。但这种做法缺乏灵活性，由于抽象类型和子类之间紧紧地绑定在一起，使得这种关系在运行时不能再修改，这使得它难以修改、扩展和重用不利于抽象和实现解耦，而且这也违背OOP原则：“优先使用对象聚集，而不是继承”。这种思想是桥接模式的精髓所在。
+
+　　　                          　
+桥接模式(Bridge)的参与者
+
+    1.Abstraction
+
+      定义抽象类的接口。
+
+      维护一个指向Implementor类型对象的指针。
+
+    2.RefinedAbstraction
+
+      扩充由Abstraction定义的接口。
+
+    3.Implementor
+
+      定义实现类的接口，该接口不一定要与Abstraction的接口完全一致。
+
+      事实上这两个接口可以完全不同。
+
+      一般来讲，Implementor接口仅提供基本操作，而Abstraction则定义了基于这些基本操作的较高层次的操作。
+
+    4.ConcreteImplementor
+
+      实现Implementor接口并定义它的具体实现。
+
+在这里用尚学堂马士兵老师的一个例子来讲解一下桥接设计模式：追MM的技术
+
+第一步：我们追MM，首先要有一个类，来封装MM，类中包括MM的属性姓名;
+
+ 1 public class MM {
+ 2 
+ 3     private String name;
+ 4 
+ 5     public String getName() {
+ 6         return name;
+ 7     }
+ 8 
+ 9     public void setName(String name) {
+10         this.name = name;
+11     }
+12     
+13 }
+
+第二步：用一个类来封装男主人公,里面包含他的一些属性和方法
+
+ 1 public class Boy {
+ 2 
+ 3     private String name;
+ 4 
+ 5     //也可以把mm放在这个位置，但是坚持高聚合，低耦合，则放到参数的位置
+ 6     //    MM mm;
+ 7     public String getName() {
+ 8         return name;
+ 9     }
+10 
+11     public void setName(String name) {
+12         this.name = name;
+13     }
+14     //追MM
+15     public void pursue(MM mm){
+16     }
+17     //给MM送礼物，礼物有分类
+18     public void give(Gift g,MM mm){
+19         
+20     }
+21 }
+
+第三步：根据方法中的参数类型，我们还需要定义一个Gift类，来代表礼物，类里面暂时什么也没有添加
+
+public class Gift {
+}
+接着我们定义具体的礼物(Flower、Ring之类的东西),在这里我们思考一个问题，可以考虑将这两个具体的礼物类(Flower和Ring)去继承Gift，但是这样的话,基类Gift和子类之间的耦合行太强，基类一旦改变，子类也要发生改变，所以在这里我们用组合来代替继承(组合就是一个类中包含另外一个类的对象的引用)
+我们暂时先这样定义两个具体类：
+
+1 public class Ring{
+2     
+3 }
+4 public class Flower{
+5     
+6 }
+
+但是礼物也分很多种分类，比如说温暖的(warm）、冷酷的(cold)、狂野的(wild),这些是我们概念上的分类，这三种修饰词和前面的两个具体类(我们的具体实现)存在排列组合的问题(因为出现了交叉)，我们可以针对不同类别的MM送不同组合的礼物，比如温暖的花送温柔的MM，酷酷的戒指送高冷的MM等等。这样的话就出现了我们前面说过的问题，礼物Gift这一类型它存在两个维度的变化，它可以是温暖的、冷酷的、狂野的，也可以是具体的Flower、Ring
+
+我们先把上面的三种分类定义出来：
+
+1 public class WarmGift extends Gift{
+2 }
+3 public class WildGift extends Gift {
+4 }
+5 public class ColdGift extends Gift{
+6 }
+
+我们如果要送温暖的花这种礼物应该怎么做？有一张想法是以Flower为基类，定义一个WarmFlower继承Flower,这样也可以，但是这样的话由于礼物种类的纷杂，会产生层出不穷的子类,比如WarmRing、ColdRing等等。
+那我们应该怎么做呢？
+
+在这里我们定义一个类GiftImpl，具体的礼物实现,具体的礼物Flower和Ring继承自GiftImpl,而让礼物的分类WarmGift、ColdGift、WildGift,继承自Gift，让Gift类内包含一个GiftImpl的引用
+
+ 1 public class Gift {
+ 2     protected GiftImpl impl;
+ 3 }
+ 4 public class WildGift extends Gift {
+ 5     public WildGift(GiftImpl impl){
+ 6         this.impl=impl;
+ 7     }
+ 8 }
+ 9 public class WarmGift extends Gift{
+10     //WarmGift继承自Gift，也继承了那个GiftImpl对象引用
+11     public WarmGift(GiftImpl impl){
+12         this.impl=impl;
+13     }
+14 }
+
+我们定义抽象类GiftImpl，定义基本的操作
+
+public abstract class GiftImpl {
+    public abstract String giftMessage();
+}
+Flower和Ring类去继承抽象类GiftImpl
+
+ 1 public class Flower extends GiftImpl{
+ 2 
+ 3     public String giftMessage() {
+ 4         
+ 5         return "鲜花";
+ 6     }
+ 7 }
+ 8 public class Ring extends GiftImpl{
+ 9 
+10     public String giftMessage() {
+11         
+12         return "戒指";
+13     }
+14 }
+
+第四步：我们的Boy类中，男主人公就可以送不同组合的礼物了。
+
+1 //追MM
+2     public void  pursue(MM mm){
+3         //我们送的是温暖的花
+4         Gift g=new WarmGift(new Flower());
+5         give(g, mm);
+6         //送给MM的是狂野的戒指
+7         g=new WildGift(new Ring());
+8         give(g, mm);
+9     }
+
+
+ 我们下面再举一个例子，包含完整的代码以及测试结果，这个例子简而言之就是"人穿裤子"。
+
+男人穿马甲
+
+男人穿裤子
+
+女人穿马甲
+
+女人穿裤子
+
+我们按照桥接模式的四个参与对象来实现我们的组合输出
+
+第一步：定义Abstraction
+
+
+ 1 //定义Abstraction 
+ 2 public abstract class Person {
+ 3     //包含两个属性,男人还是女人，穿的衣服的种类
+ 4     private Clothing clothing;
+ 5     private String type;
+ 6     public Clothing getClothing() {
+ 7         return clothing;
+ 8     }
+ 9     public void setClothing(Clothing clothing) {
+10         this.clothing = clothing;
+11     }
+12     public String getType() {
+13         return type;
+14     }
+15     public void setType(String type) {
+16         this.type = type;
+17     }
+18     public abstract void dress();
+19 }
+
+
+
+第二步：定义RefinedAbstraction 
+
+
+ 1 class Man extends Person {
+ 2 
+ 3     public Man(){
+ 4         setType("男人");
+ 5     }
+ 6     //dress方法定义男、女和衣服的排列组合
+ 7     public void dress() {
+ 8           Clothing clothing = getClothing();
+ 9           clothing.personDressCloth(this);
+10     }
+11 
+12 }
+13 class Women extends Person {
+14 
+15     public Women(){
+16         setType("女人");
+17     }
+18     //dress方法定义男、女和衣服的排列组合
+19     public void dress() {
+20           Clothing clothing = getClothing();
+21           clothing.personDressCloth(this);
+22     }
+23 
+24 }
+
+
+第三步：定义Implementor
+
+1 public abstract class Clothing {
+2 
+3     public void personDressCloth(Person person); 
+4 }
+第四步：定义ConcreteImplementor
+
+
+
+ 1 class Pants extends Clothing{
+ 2 
+ 3     public void personDressCloth(Person person) {
+ 4         System.out.println(person.getType() + "穿裤子");
+ 5     }
+ 6     
+ 7 }
+ 8 class Jacket extends Clothing{
+ 9 
+10     public void personDressCloth(Person person) {
+11         System.out.println(person.getType() + "穿马甲");
+12     }
+13     
+14 }
+
+第五步：写个测试类
+
+ 1 public class BridgeTest {
+ 2 
+ 3     /**
+ 4      * @param args
+ 5      */
+ 6     public static void main(String[] args) {
+ 7         Person man=new Man();
+ 8         Person women=new Women();
+ 9         Clothing jacket=new Jacket();
+10         Clothing pants=new Pants();
+11         //男人穿马甲
+12         jacket.personDressCloth(man);
+13         //女人穿马甲
+14         jacket.personDressCloth(women);
+15         //男人穿裤子
+16         pants.personDressCloth(man);
+17         //女人穿裤子
+18         pants.personDressCloth(women);        
+19     }
+20 }

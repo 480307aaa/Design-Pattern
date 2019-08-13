@@ -4,4 +4,4 @@
     虽然组合模式能够清晰地定义分层次的复杂对象，也使得增加新构件也更容易，但是这样就导致了系统的设计变得更加抽象，如果系统的业务规则比较复杂的话，使用
 组合模式就有一定的挑战了。
 
-具体参考：https://blog.csdn.net/fjxcsdn/article/details/80458954
+具体参考：https://www.cnblogs.com/jiqing9006/p/5932974.html

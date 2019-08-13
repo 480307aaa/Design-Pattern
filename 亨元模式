@@ -1,0 +1,153 @@
+设计模式之禅——亨元模式
+
+ 
+
+一、亨元模式的定义
+
+       亨元模式是池技术的重要实现方式；我理解的就是，在使用一个对象时，如果这个对象在内存中有，就从内存中取出使用，如果没有，就新建一个这个对象，然后存到内存中去。这样能够使用共享对象，能够有效的支持大量的细颗粒对象。
+
+       亨元模式有两个要求：细颗粒的对象和共享对象。我们知道分配太多的对象到应用程序中将有损程序的性能，同时还容易造成内存溢出，这时就应该使用亨元模式了。最适合在缓冲池的场景了。
+
+       其实数据库连接池等，都是一种亨元模式，在JDK中也有亨元模式，比如String类的intern()方法（最后为给出这个方法的示例）
+
+ 
+
+二、亨元模式示例代码：
+
+首先是抽象的亨元角色：
+
+package com.wang.flyweightPattern;
+
+/**
+ * 抽象亨元角色
+ * 
+ * @author wang
+ * 
+ */
+public abstract class Flyweight {
+
+	/*
+	 * 内部状态
+	 */
+	private String intrinsic;
+
+	/*
+	 * 外部状态
+	 */
+	protected final String extrinsic;
+
+	/**
+	 * 要求亨元角色必须接受外部状态
+	 * 
+	 * @param extrinsic
+	 *            外部状态
+	 */
+	public Flyweight(String extrinsic) {
+		this.extrinsic = extrinsic;
+	}
+
+	/**
+	 * 定义业务操作
+	 */
+	public abstract void operate();
+
+	public String getIntrinsic() {
+		return intrinsic;
+	}
+
+	public void setIntrinsic(String intrinsic) {
+		this.intrinsic = intrinsic;
+	}
+
+}
+ 具体的亨元角色，可以有多个，都是继承自抽象亨元角色：
+
+package com.wang.flyweightPattern;
+
+/**
+ * 具体亨元角色
+ * 
+ * @author wang
+ * 
+ */
+public class ConcreteFlyweight1 extends Flyweight {
+
+	public ConcreteFlyweight1(String extrinsic) {
+		super(extrinsic);
+	}
+
+	@Override
+	public void operate() {
+		System.out.println("ConcreteFlyweight1 ... operate...");
+	}
+
+}
+ 最后就是亨元的工厂：
+
+package com.wang.flyweightPattern;
+
+import java.util.HashMap;
+
+/**
+ * 亨元工厂
+ * 
+ * @author wang
+ * 
+ */
+public class FlyweightFactory {
+
+	/*
+	 * 定义一个容量池
+	 */
+	private static HashMap<String, Flyweight> pool = new HashMap<String, Flyweight>();
+
+	public static Flyweight getFlyweight(String extrinsic) {
+		
+		// 需要返回的对象
+		Flyweight flyweight = null;
+		/*
+		 * 如果池中有该对象，从池中取；
+		 * 如果池中没有该对象，创建一个对象，并放到池中。
+		 */
+		if( pool.containsKey(extrinsic) ){
+			flyweight = pool.get(extrinsic);
+		} else {
+			flyweight = new ConcreteFlyweight1(extrinsic);
+			pool.put(extrinsic, flyweight);
+		}
+		return flyweight;
+	}
+}
+ 当我们看到最后的亨元工厂后，会不会感觉很熟悉，“着我用过啊”，对，亨元模式很常用，这就是亨元模式。
+
+三、最后我们看看JDK中的亨元模式的一个小例子：
+
+package com.wang.flyweightPattern.example;
+
+/**
+ * String类中的亨元模式
+ * 
+ * @author wang
+ *
+ */
+public class StringIntern {
+
+	public static void main(String[] args) {
+
+		String str1 = "和谐";
+		String str2 = "社会";
+		String str3 = "和谐社会";
+		String str4;
+		str4 = str1 + str2;
+		System.out.println(str3 == str4);
+		/*
+		 * String类中的intern()方法，
+		 * 如果是String的对象池中有该类型的值，
+		 * 则直接返回对象池中的对象
+		 */
+		str4 = (str1 + str2).intern();
+		System.out.println(str3 == str4);
+	}
+}
+
+原文地址：http://www.voidcn.com/article/p-hdcjtprd-boy.html

@@ -1,0 +1,142 @@
+策略模式的定义:
+
+定义了算法族，分别封装起来，让它们之间可以互相替换 ，此模式让算法的变化独立于使用算法的客户 
+
+策略模式的意义:
+
+　  策略模式使开发人员能够开发出由许多可替换的部分组成的软件，并且各个部分之间是低耦合的关系。
+　  低耦合的特性使软件具有更强的可扩展性，易于维护；更重要的是，它大大提高了软件的可重用性。
+
+策略模式中有三个对象：
+
+      环境对象(Context)：该类中实现了对抽象策略中定义的接口或者抽象类的引用。
+      抽象策略对象(Strategy)：它可由接口或抽象类来实现。
+      具体策略对象(ConcreteStrategy)：它封装了实现同不功能的不同算法。　　　　　　　　　
+
+策略模式的实现：
+
+　　1.对策略对象定义一个公共接口。
+
+　　2.编写策略类，该类实现了上面的公共接口。
+
+　　3.在使用策略对象的类中保存一个对策略对象的引用。
+
+　　4.在使用策略对象的类中，实现对策略对象的set和get方法或者使用构造方法完成赋值。
+
+具体代码实现：
+
+定义一个接口( 抽象策略)，定义一个方法用于对两个整数进行运算
+
+1 public interface Strategy {
+2 
+3     public abstract int calculate(int a,int b);
+4 }
+
+定义具体的算法类，实现两个整数的加减乘除运算，但是外部调用形式需要符合接口的定义
+
+实现加法运算
+
+1 public class AddStrategy implements Strategy{
+2 
+3     @Override
+4     public int calculate(int a, int b) {
+5         
+6         return a+b;
+7     }
+8 
+9 }
+
+实现减法运算
+1 public class SubstractStrategy implements Strategy{
+2 
+3     @Override
+4     public int calculate(int a, int b) {
+5         
+6         return a-b;
+7     }
+8 
+9 }
+
+实现乘法运算
+
+1 public class MultiplyStrategy implements Strategy {
+2 
+3     @Override
+4     public int calculate(int a, int b) {
+5         
+6         return a*b;
+7     }
+8 
+9 }
+
+实现除法运算
+
+ 1 public class DivisionStrategy  implements Strategy{
+ 2 
+ 3     @Override
+ 4     public int calculate(int a, int b) {
+ 5         if(b!=0){
+ 6             
+ 7             return a/b;
+ 8         }
+ 9         else {
+10             throw new RuntimeException("除数不能为零");
+11         }
+12     }
+13 
+14 }
+
+定义具体的环境角色，持有Strategy接口的引用，并且有get和set方法可以完成策略更换。在环境角色中调用接口的方法完成动作。
+
+ 1 public class Context {
+ 2 
+ 3     private Strategy strategy;
+ 4     
+ 5     public Context(Strategy strategy) {
+ 6         super();
+ 7         this.strategy = strategy;
+ 8     }
+ 9 
+10     public Strategy getStrategy() {
+11         return strategy;
+12     }
+13 
+14     public void setStrategy(Strategy strategy) {
+15         this.strategy = strategy;
+16     }
+17     public int calculate(int a,int b){
+18         return strategy.calculate(a, b);
+19     }
+20 }
+
+这样客户端在调用时，只需向环境角色设置相应的算法类，然后就可以得到相应的结果。
+
+ 1 public class StrategyTest {
+ 2 
+ 3     /**
+ 4      * @param args
+ 5      */
+ 6     public static void main(String[] args) {
+ 7 
+ 8         //加法
+ 9         Context context=new Context(new AddStrategy());
+10         System.out.println(context.calculate(10, 5));
+11         //减法
+12         Context context2=new Context(new SubstractStrategy());
+13         System.out.println(context2.calculate(3, 2));
+14         //乘法
+15         Context context3=new Context(new MultiplyStrategy());
+16         System.out.println(context3.calculate(6, 8));
+17         //除法
+18         Context context4=new Context(new DivisionStrategy());
+19         System.out.println(context4.calculate(90, 9));    
+20     }
+21 
+22 }
+
+策略模式的缺点：
+
+1、客户端必须知道所有的策略类，并自行决定使用哪一个策略类。这就意味着客户端必须理解这些算法的区别，以便适时选择恰当的算法类。换言之，策略模式只适用于
+   客户端知道所有的算法或行为的情况。
+2、策略模式造成很多的策略类，每个具体策略类都会产生一个新类。有时候可以通过把依赖于环境的状态保存到客户端里面，而将策略类设计成可共享的，这样策略类实
+例可以被不同客户端使用。换言之，可以使用享元模式来减少对象的数量。

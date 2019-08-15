@@ -1,0 +1,171 @@
+    在很多情况下我们对象的行为依赖于它的一个或者多个变化的属性，这些可变的属性我们称之为状态，也就是说行为依赖状态，即当该对象因为在外部的互动而导致他的
+状态发生变化，从而它的行为也会做出相应的变化。对于这种情况，我们是不能用行为来控制状态的变化，而应该站在状态的角度来思考行为，即是什么状态就要做出什么样
+的行为。这个就是状态模式。所以状态模式就是允许对象在内部状态发生改变时改变它的行为，对象看起来好像修改了它的类。
+    在状态模式中我们可以减少大块的if…else语句，它是允许态转换逻辑与状态对象合成一体，但是减少if…else语句的代价就是会换来大量的类，所以状态模式势必会增
+加系统中类或者对象的个数。同时状态模式是将所有与某个状态有关的行为放到一个类中，并且可以方便地增加新的状态，只需要改变对象状态即可改变对象的行为。但是这
+样就会导致系统的结构和实现都会比较复杂，如果使用不当就会导致程序的结构和代码混乱，不利于维护。
+状态模式(State)的定义
+
+定义对象间的一种一对多的依赖关系,当一个对象的状态（对象内部的属性，可以理解成是对象的某个字段或者方法）发生改变时,所有依赖于它的对象都得到通知并被自动更新。允许一个对象在其内部状态改变时改变它的行为。对象看起来似乎修改了它的类
+
+状态模式(State)适用性
+
+  1.一个对象的行为取决于它的状态,并且它必须在运行时刻根据状态改变它的行为。
+
+  2.一个操作中含有庞大的多分支的条件语句，且这些分支依赖于该对象的状态。
+
+      这个状态通常用一个或多个枚举常量表示。
+
+      通常,有多个操作包含这一相同的条件结构。
+
+      State模式将每一个条件分支放入一个独立的类中。
+
+      这使得你可以根据对象自身的情况将对象的状态作为一个对象，这一对象可以不依赖于其他对象而独立变化。
+
+状态模式(State)的参与者
+
+1.Context
+
+      定义客户感兴趣的接口。
+
+      维护一个ConcreteState子类的实例，这个实例定义当前状态。
+
+2.State
+
+      定义一个接口以封装与Context的一个特定状态相关的行为。
+
+3.ConcreteStatesubclasses
+
+      每一子类实现一个与Context的一个状态相关的行为。
+
+
+具体代码实现：
+
+定义State
+
+1 //定义和Context中的状态相对应的行为
+2 public interface State {
+3     //获取天气情况
+4     String getState();
+5 }
+定义Context
+
+ 1 //定义当前的状态
+ 2 public class Context {
+ 3 
+ 4     private State state;
+ 5 
+ 6     public State getState() {
+ 7         return state;
+ 8     }
+ 9 
+10     public void setState(State state) {
+11         this.state = state;
+12     }
+13     public String stateMessage(){
+14         return state.getState();
+15     }
+16 }
+定义ConcreteStatesubclasses
+
+ 1 class Sunshine implements State{
+ 2 
+ 3     @Override
+ 4     public String getState() {
+ 5         
+ 6         return "晴天";
+ 7     }
+ 8     
+ 9 }
+10 class Rain implements State{
+11 
+12     @Override
+13     public String getState() {
+14         
+15         return "下雨";
+16     }
+17     
+18 }
+
+测试一下
+
+ 1 public class StateTest {
+ 2 
+ 3     public static void main(String args[]){
+ 4         Context context=new Context();
+ 5         context.setState(new Rain());
+ 6         System.out.println(context.stateMessage());
+ 7         context.setState(new Sunshine());
+ 8         System.out.println(context.stateMessage());
+ 9     }
+10 }
+运行结果：
+
+下雨
+晴天
+
+接下来我们用Java编程思想中的一个例子来讲解一下状态模式
+
+　　我们学习了多态，看起来似乎所有的东西都可以去继承，因为多态是一个如此巧妙的工具。事实上，当我们使用现成的类建立新类时，如果首先考虑使用继承技术，反
+倒会加重我们的设计负担，使得事情变得复杂起来。更好的设计思想是首先选择"组合",尤其是不能十分确定应该使用哪一种方式的时候。组合不会强制我们的程序设计进
+入继承的层次结构中。而且，组合更加灵活，因为它可以动态选择类型(因此也就选择了行为)，想法，继承在编译时就需要知道确定的类型，下面是具体代码体现：
+
+ 1 //相当于状态模式中的state
+ 2 class Actor {
+ 3 
+ 4     public void act(){
+ 5     }
+ 6 }
+ 7 //相当于状态模式中的ConcreteStateSubclassess
+ 8 class HappyActor extends Actor{
+ 9     public void act(){
+10         System.out.println("HappyActor");
+11     }
+12 }
+13 class SadActor extends Actor{
+14     public void act(){
+15         System.out.println("SadActor");
+16     }
+17 }
+18 //相当于状态模式中的Context
+19 class Stage{
+20     private Actor actor=new HappyActor();
+21     //改变引用actor的指向的具体类型
+22     public void change(){
+23         actor=new SadActor();
+24     }
+25     //根据状态的不同执行不同的行为
+26     public void performPlay(){
+27         actor.act();
+28     }
+29 }
+测试一下：
+
+ 1 public class Transmogrify {
+ 2 
+ 3     /**
+ 4      * @param args
+ 5      */
+ 6     public static void main(String[] args) {
+ 7 
+ 8         Stage stage=new Stage();
+ 9         stage.performPlay();
+10         stage.change();
+11         stage.performPlay();
+12     }
+13 
+14 }
+运行结果：
+
+HappyActor
+SadActor
+
+程序分析：在这里，Stage对象包含一个对Actor的引用，而Actor被初始化为HappyActor对象，这意味着performPlay()会产生某种特殊行为。既然引用在运行时可以和
+另一个不同的对象重新绑定起来，SadActor对象的引用可以在actor中被替换，然后由performPlay()产生的行为也随之改变，这样一来，我们在运行期间获得了动态灵活
+性。与此相反的是，我们不能在运行期间决定继承不同的对象，因为它要求在编译期间完全确定下来。大家是不是觉得状态模式和策略模式不是一样的吗？
+我们讲一下他们之间的区别和联系：状态模式和策略模式的区别和联系(取自知乎网友的回答，很精辟)：
+
+区别：
+状态模式将各个状态所对应的操作分离开来，即对于不同的状态，由不同的子类实现具体操作，不同状态的切换由子类实现，当发现传入参数不是自己这个状态所对应的参数，则自己给Context类切换状态；而策略模式是直接依赖注入到Context类的参数进行选择策略，不存在切换状态的操作联系。
+联系：
+状态模式和策略模式都是为具有多种可能情形设计的模式，把不同的处理情形抽象为一个相同的接口，符合对扩展开放，对修改封闭的原则。还有就是，策略模式更具有一般性一些，在实践中，可以用策略模式来封装几乎任何类型的规则，只要在分析过程中听到需要在不同实践应用不同的业务规则，就可以考虑使用策略模式处理，在这点上策略模式是包含状态模式的功能的，策略模式是一个重要的设计模式。

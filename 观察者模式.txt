@@ -1,3 +1,5 @@
+    何谓观察者模式？观察者模式定义了对象之间的一对多依赖关系，这样一来，当一个对象改变状态时，它的所有依赖者都会收到通知并且自动更新。在这里，发生改变的对象称之为观察目标，而被通知的对象称之为观察者。一个观察目标可以对应多个观察者，而且这些观察者之间没有相互联系，所以么可以根据需要增加和删除观察者，使得系统更易于扩展。所以观察者提供了一种对象设计，让主题和观察者之间以松耦合的方式结合。
+
 import java.util.ArrayList;
 
 /**
@@ -7,7 +9,7 @@ public class TestMyIdea {
     public static void main(String[] args) {
 
         WeatherData weatherData = new WeatherData();
-        //������һ����ʾ��
+        //建立第一个告示牌
         CurrentConditionDispaly currentConditionDispaly = new CurrentConditionDispaly(weatherData);
         weatherData.setMeasurements(80, 65, 30.4f);
         weatherData.setMeasurements(82, 70, 29.2f);
@@ -16,7 +18,7 @@ public class TestMyIdea {
 }
 
 /**
- * ����ӿ�
+ * 主题接口
  */
 interface Subject {
 
@@ -28,22 +30,22 @@ interface Subject {
 }
 
 /**
- * �۲��߽ӿ�
+ * 观察者接口
  */
 interface Observer {
     public void update(double temp, double humidity, double pressure);
 }
 
 /**
- * ������״̬�ı�ʱ����������ᱻ
- * ���ã���֪ͨ���еĹ۲��ߡ�
+ * 当主题状态改变时，这个方法会被
+ * 调用，以通知所有的观察者。
  */
 interface DisplyElement {
     public void display();
 }
 
 /**
- * weathData����:��װ��Ҫ��صı仯
+ * weathData对象:封装需要监控的变化
  */
 class WeatherData implements Subject {
 
@@ -101,7 +103,7 @@ class WeatherData implements Subject {
     }
 
     /**
-     * ֪ͨ�۲��������иı�
+     * 通知观察者数据有改变
      */
     @Override
     public void notifyObservers() {
@@ -112,7 +114,7 @@ class WeatherData implements Subject {
     }
 
     /**
-     * ���ݷ����ı䣬֪ͨ�۲���
+     * 数据发生改变，通知观察者
      */
     public void measureChange() {
         notifyObservers();
@@ -132,19 +134,19 @@ class CurrentConditionDispaly implements Observer, DisplyElement {
     private double temp;
     private double humidity;
     /**
-     * �ö������ڽ��۲���ע�ᵽ������ʹ��
+     * 该对象用于将观察者注册到主题上使用
      */
     Subject weatherData;
 
     public CurrentConditionDispaly(Subject weatherData) {
         this.weatherData = weatherData;
-        //���۲���ע�ᵽ����
+        //将观察者注册到主题
         weatherData.registerObserver(this);
     }
 
 
     /**
-     * update����������ʱ�������display�����������ݵ�չʾ
+     * update方法被调用时，会调用display方法进行数据的展示
      *
      * @param temp
      * @param humidity
@@ -159,7 +161,7 @@ class CurrentConditionDispaly implements Observer, DisplyElement {
 
     @Override
     public void display() {
-        System.out.println("�¶�Ϊ" + temp + "�ȣ�" + "ʪ��Ϊ" + humidity);
+        System.out.println("温度为" + temp + "度，" + "湿度为" + humidity);
     }
 }
 

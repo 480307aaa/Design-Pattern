@@ -1,0 +1,145 @@
+中介者模式(Mediator)的定义
+
+用一个中介对象来封装一系列的对象交互。中介者使各对象不需要显式地相互引用，从而使其耦合松散，而且可以独立地改变它们之间的交互。
+
+中介者模式(Mediator)的适用性
+
+1.一组对象以定义良好但是复杂的方式进行通信，产生的相互依赖关系结构混乱且难以理解。
+
+2.一个对象引用其他很多对象并且直接与这些对象通信,导致难以复用该对象。
+
+3.想定制一个分布在多个类中的行为，但又不想生成太多的子类。
+
+中介者模式(Mediator)的参与者
+
+1.Mediator
+
+中介者定义一个接口用于与各同事（Colleague）对象通信。
+
+2.ConcreteMediator
+
+具体中介者通过协调各同事对象实现协作行为，了解并维护它的各个同事。
+
+3.Colleague:
+
+抽象同事类。
+
+４.Colleagueclass
+
+具体同事类。每个具体同事类都只需要知道自己的行为即可，但是他们都需要认识中介者
+　　　　　　　　　　　　　　　　
+
+具体代码实现：
+
+第一步：定义Mediator
+
+1 //定义抽象Mediator,可以与同时们进行联络
+2 public abstract class Mediator {
+3     public abstract void contact(String content,Colleague coll);
+4 }
+ 第二步：定义抽象Colleague
+
+1 public class Colleague {
+2     protected String name;
+3     protected Mediator mediator;
+4 
+5     public Colleague(String name, Mediator mediator) {
+6         this.name = name;
+7         this.mediator = mediator;
+8     }
+9 }
+ 第三步：定义具体Colleagueclass
+
+ 1 public class ColleagueA extends Colleague {
+ 2 
+ 3     // 具体同事类继承自Colleague,此刻就可以与中介者mediator进行通信了
+ 4     public ColleagueA(String name, Mediator mediator) {
+ 5         super(name, mediator);
+ 6     }
+ 7     public void getMessage(String message){
+ 8         System.out.println("同事A"+name+"获得信息"+message);
+ 9     }
+10     //同事A与中介者通信
+11     public void contact(String message){
+12         mediator.contact(message, this);
+13     }
+14 }
+15 public class ColleagueB extends Colleague {
+16 
+17     public ColleagueB(String name, Mediator mediator) {
+18         super(name, mediator);
+19     }
+20     public void getMessage(String message){
+21         System.out.println("同事B"+name+"获得信息"+message);
+22     }
+23     //同事B与中介者通信
+24     public void contact(String message){
+25         mediator.contact(message, this);
+26     }
+27 }
+第四步：定义具体中介者ConcreteMediator,具体中介者通过协调各同事对象实现协作行为，了解并维护它的各个同事。
+
+ 1 //定义具体中介者ConcreteMediator,具体中介者通过协调各同事对象实现协作行为，了解并维护它的各个同事。
+ 2 public class ConcreteMediator extends Mediator {
+ 3     ColleagueA collA;
+ 4     ColleagueB collB;
+ 5 
+ 6     public ColleagueA getCollA() {
+ 7         return collA;
+ 8     }
+ 9 
+10     public void setCollA(ColleagueA collA) {
+11         this.collA = collA;
+12     }
+13 
+14     public ColleagueB getCollB() {
+15         return collB;
+16     }
+17 
+18     public void setCollB(ColleagueB collB) {
+19         this.collB = collB;
+20     }
+21 
+22     @Override
+23     public void contact(String content, Colleague coll) {
+24         if (coll==collA) {
+25             collB.getMessage(content);
+26         } else {
+27             collA.getMessage(content);
+28         }
+29     }
+30 }
+第五步：定义Client，测试中介者模式的使用
+
+ 1 public class Client {
+ 2 
+ 3     /**
+ 4      * @param args
+ 5      */
+ 6     // 中介者，ColleagueA、ColleagueB
+ 7     public static void main(String[] args) {
+ 8         // 定义中介者
+ 9         ConcreteMediator mediator = new ConcreteMediator();
+10         // 定义具体同事类
+11         ColleagueA colleagueA = new ColleagueA("张三", mediator);
+12         ColleagueB colleagueB = new ColleagueB("李四", mediator);
+13         // 中介者知晓每一个具体的Colleague类
+14         mediator.setCollA(colleagueA);
+15         mediator.setCollB(colleagueB);
+16         colleagueA.contact("我是A，我要和同事B说说工作的事情");
+17         colleagueB.contact("我是B,我下午有时间,下午商量吧");
+18     }
+19 
+20 }
+运行结果:
+
+同事B李四获得信息:我是A，我要和同事B说说工作的事情
+同事A张三获得信息:我是B,我下午有时间,下午商量吧
+总结：
+中介者就是一个处于众多对象中间，并恰当地处理众多对象之间相互之间的联系的角色。以上代码中只有两个参与者类，但是这些我们都可以根据中介者模式的宗旨进行
+适当地扩展，即增加参与者类，然后中介者就得担负更加重的任务了，我们看到上面具体中介者类Mediator中的方法比较多而且有点乱。 所以，在解耦参与者类之间的
+联系的同时，中介者自身也不免任务过重，因为几乎所有的业务逻辑都交代到中介者身上了，可谓是“万众期待”的一个角色了。这就是中介者模式的不足之处了。此外，
+上面这个代码例子的参与者的属性和方法都是一样的，我们可以抽取一个抽象类出来，减少代码，但是有时候我们根本抽取不了多个“参与者”之间的共性来形成一个抽象
+类，这也大大增加了中介者模式的使用难度。 
+
+ 

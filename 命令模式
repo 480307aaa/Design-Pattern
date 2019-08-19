@@ -1,0 +1,149 @@
+命令模式(Command)的定义
+
+将一个请求封装为一个对象，从而可用不同的请求对客户进行参数化；对请求排队或记录日志，以及支持可撤销的操作，将”发出请求的对象”和”接收与执行这些请求的对象”分隔开来。
+
+命令模式(Command)的适用性
+
+    1.抽象出待执行的动作以参数化某对象。
+
+    2.在不同的时刻指定、排列和执行请求。
+
+    3.支持取消操作。
+
+    4.支持修改日志，这样当系统崩溃时，这样修改可以被重做一遍。
+
+    5.用构建在原语操作上的高层操作构造一个系统。
+
+命令模式(Command)的应用效果：
+1)command模式将调用操作的对象和实现该操作的对象解耦
+2)可以将多个命令装配成一个复合命令，复合命令是Composite模式的一个实例
+3)增加新的command很容易，无需改变已有的类
+
+命令模式(Command)的参与者
+
+　 1.Command
+
+      声明执行操作的接口。
+
+    2.ConcreteCommand
+
+      将一个接收者对象绑定于一个动作。
+
+      调用接收者相应的操作，以实现Execute。
+
+    3.Client
+
+      创建一个具体命令对象并设定它的接收者。
+
+    4.Invoker
+
+      要求该命令执行这个请求。
+
+    5.Receiver
+
+      知道如何实现与执行一个请求相关的操作。任何类都可能作为一个接收者。　　　　　　　　
+
+具体的代码实现：
+
+第一步：定义Command，声明执行操作的接口
+
+1 //命令接口
+2 public interface Command {
+3 
+4     //执行操作
+5     public void excute();
+6     //撤销操作
+7     public void unDo();
+8 }
+第二步：定义ConcreteCommand,将一个接收者对象绑定于一个动作。
+
+ 1 public class ConcreteCommand implements Command {
+ 2 
+ 3     // 持有一个接受者Receiver的引用，绑定一个特定的操作
+ 4     Receiver receiver;
+ 5 
+ 6     public ConcreteCommand(Receiver receiver) {
+ 7         this.receiver = receiver;
+ 8     }
+ 9 
+10     @Override
+11     public void excute() {
+12         // 接受者绑定执行动作
+13         receiver.action();
+14     }
+15 
+16     @Override
+17     public void unDo() {
+18         // 接受者绑定的撤销动作
+19         receiver.unAction();
+20     }
+21 }
+第三步：定义Receiver,知道如何实现与执行一个请求相关的操作
+
+ 1 public class Receiver {
+ 2 
+ 3     public void action() {
+ 4         System.out.println("执行一个命令");
+ 5     }
+ 6 
+ 7     public void unAction() {
+ 8         System.out.println("撤销一个命令");
+ 9     }
+10 }
+第四步：定义Invoker，要求该命令执行这个请求。
+
+ 1 public class Invoker {
+ 2 
+ 3     // 调用者持有一个命令对象
+ 4     Command command;
+ 5 
+ 6     public Command getCommand() {
+ 7         return command;
+ 8     }
+ 9 
+10     public void setCommand(Command command) {
+11         this.command = command;
+12     }
+13 
+14     // 执行命令
+15     public void excuteCommmand() {
+16         command.excute();
+17     }
+18 
+19     // 撤销命令
+20     public void undoCommand() {
+21         command.unDo();
+22     }
+23 }
+第五步：定义Clien，我们来测试一下我们的命令模式
+
+ 1 public class Client {
+ 2 
+ 3     /**
+ 4      * @param args
+ 5      */
+ 6     public static void main(String[] args) {
+ 7         // 创建命令的接受者
+ 8         Receiver receiver = new Receiver();
+ 9         // 创建命令对象，并设定它的接受者
+10         Command command = new ConcreteCommand(receiver);
+11         // 创建命令执行者，并将相应的命令作为参数传递给Invoker
+12         Invoker invoker = new Invoker();
+13         invoker.setCommand(command);
+14         // Client端测试一下
+15         invoker.excuteCommmand();
+16         invoker.undoCommand();
+17     }
+18 
+19 }
+运行结果：
+
+执行一个命令
+撤销一个命令
+总结：
+
+1、在被解耦的两者之间是通过命令对象进行沟通的,命令对象封装了接收者和一个或一组动作;
+2、调用者通过调用命令对象的execute()发出请求，这会使得接收者的动作被调用;
+3、调用者可以接受命令当作参数，甚至在运行时动态的进行;
+4、命令可以支持撤销，做法是实现一个undo()方法来回到execute()被执行前的状态;
+5、命令模式将发出请求的对象和执行请求的对象进行解耦;
